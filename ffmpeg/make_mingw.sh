@@ -129,6 +129,29 @@ AOM_CONFIGURE_OPTIONS="-DENABLE_TESTS=OFF -DENABLE_EXAMPLES=OFF -DENABLE_TOOLS=O
   cmake --build . --target install
 )
 
+## SRT: https://github.com/Haivision/srt
+
+SRT_DIR=${BUILD_DIR}/srt
+if [ ! -d ${AOM_DIR} ]; then
+  echo "AOM source tree is not found"
+  exit 1
+fi
+SRT_X86_DIR=${BUILD_DIR}/srt_x86
+SRT_X64_DIR=${BUILD_DIR}/srt_x64
+SRT_CONFIGURE_OPTIONS="-DENABLE_C_DEPS=ON -DENABLE_SHARED=OFF -DENABLE_STATIC=ON -DENABLE_ENCRYPTION=OFF"
+(
+  mkdir -p "${SRT_X86_DIR}"
+  cd "${SRT_X86_DIR}"
+  cmake -DSRT_TARGET_CPU=generic -DCMAKE_TOOLCHAIN_FILE=${AOM_DIR}/build/cmake/toolchains/x86-mingw-gcc.cmake -DCMAKE_INSTALL_PREFIX=${SRT_X86_DIR}/install ${SRT_CONFIGURE_OPTIONS} ${SRT_DIR}
+  cmake --build . --target install
+)
+(
+  mkdir -p "${SRT_X64_DIR}"
+  cd "${SRT_X64_DIR}"
+  cmake -DSRT_TARGET_CPU=generic -DCMAKE_TOOLCHAIN_FILE=${AOM_DIR}/build/cmake/toolchains/x86_64-mingw-gcc.cmake -DCMAKE_INSTALL_PREFIX=${SRT_X64_DIR}/install ${SRT_CONFIGURE_OPTIONS} ${SRT_DIR}
+  cmake --build . --target install
+)
+
 FFMPEG_DIR=${BUILD_DIR}/ffmpeg
 if [ ! -d ${FFMPEG_DIR} ]; then
   echo "FFMPEG source tree is not found"
@@ -139,14 +162,14 @@ fi
 
 FFMPEG_x86_DIR=${BUILD_DIR}/ffmpeg_x86
 FFMPEG_x86_64_DIR=${BUILD_DIR}/ffmpeg_x86_64
-FFMPEG_CONFIGURE_OPTIONS="--pkg-config=pkg-config --enable-static --enable-avresample --enable-w32threads --enable-libopenh264 --enable-libvpx --disable-filters --disable-bsfs --disable-programs --disable-debug --disable-cuda --disable-cuvid --disable-nvenc --enable-libaom"
+FFMPEG_CONFIGURE_OPTIONS="--pkg-config=pkg-config --enable-static --enable-avresample --enable-w32threads --enable-libopenh264 --enable-libvpx --disable-filters --disable-bsfs --disable-programs --disable-debug --disable-cuda --disable-cuvid --disable-nvenc --enable-libaom --enable-libsrt"
 #[ -d ${FFMPEG_x86_DIR} ] ||
 (
  cd ${FFMPEG_DIR}
  mkdir -p ${FFMPEG_x86_DIR}
  rsync -a ./ ${FFMPEG_x86_DIR} --exclude .git
  cd ${FFMPEG_x86_DIR}
- PKG_CONFIG_PATH=${openh264_x86_DIR}/lib/pkgconfig:${libvpx_x86_DIR}/install/lib/pkgconfig:${AOM_X86_DIR}/install/lib/pkgconfig ./configure --enable-cross-compile --arch=x86 --target-os=mingw32 --cross-prefix=i686-w64-mingw32- ${FFMPEG_CONFIGURE_OPTIONS} --prefix=`pwd`/install
+ PKG_CONFIG_PATH=${openh264_x86_DIR}/lib/pkgconfig:${libvpx_x86_DIR}/install/lib/pkgconfig:${AOM_X86_DIR}/install/lib/pkgconfig:${SRT_X86_DIR}/install/lib/pkgconfig ./configure --enable-cross-compile --arch=x86 --target-os=mingw32 --cross-prefix=i686-w64-mingw32- ${FFMPEG_CONFIGURE_OPTIONS} --prefix=`pwd`/install
  make -j${CPU_COUNT} install
 )
 #[ -d ${FFMPEG_x86_64_DIR} ] ||
@@ -155,7 +178,8 @@ FFMPEG_CONFIGURE_OPTIONS="--pkg-config=pkg-config --enable-static --enable-avres
  mkdir -p ${FFMPEG_x86_64_DIR}
  rsync -a ./ ${FFMPEG_x86_64_DIR} --exclude .git
  cd ${FFMPEG_x86_64_DIR}
- PKG_CONFIG_PATH=${openh264_x86_64_DIR}/lib/pkgconfig:${libvpx_x64_DIR}/install/lib/pkgconfig:${AOM_X64_DIR}/install/lib/pkgconfig ./configure --enable-cross-compile --arch=x86_64 --target-os=mingw32 --cross-prefix=x86_64-w64-mingw32- ${FFMPEG_CONFIGURE_OPTIONS} --prefix=`pwd`/install
+ PKG_CONFIG_PATH=${openh264_x86_64_DIR}/lib/pkgconfig:${libvpx_x64_DIR}/install/lib/pkgconfig:${AOM_X64_DIR}/install/lib/pkgconfig:${SRT_X64_DIR}/install/lib/pkgconfig ./configure --enable-cross-compile --arch=x86_64 --target-os=mingw32 --cross-prefix=x86_64-w64-mingw32- ${FFMPEG_CONFIGURE_OPTIONS} --prefix=`pwd`/install
+
  make -j${CPU_COUNT} install
 )
 

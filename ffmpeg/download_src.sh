@@ -28,6 +28,8 @@ update openh264 https://github.com/cisco/openh264.git v1.8.0
 update libvpx https://chromium.googlesource.com/webm/libvpx.git v1.13.0
 # https://aomedia.googlesource.com/aom
 update aom https://aomedia.googlesource.com/aom v3.6.1
+# https://github.com/Haivision/srt
+update srt https://github.com/Haivision/srt.git v1.5.3
 )
 
 # Pack all source code / build scripts
