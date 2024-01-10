@@ -22,6 +22,11 @@ mkdir -p ../build
 cd ../build
 # https://github.com/FFmpeg/FFmpeg/releases
 update ffmpeg git://source.ffmpeg.org/ffmpeg.git n4.4.4
+
+# Need to fix ffmpeg config to require_pkg_config to work for srt
+sed -i 's|libsrt "srt >= 1.3.0" srt/srt.h srt_socket|libsrt "srt >= 1.3.0" srt/srt.h ""|g' \
+    ffmpeg/configure
+
 # https://github.com/cisco/openh264/releases
 update openh264 https://github.com/cisco/openh264.git v1.8.0
 # https://chromium.googlesource.com/webm/libvpx.git
