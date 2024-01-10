@@ -129,26 +129,54 @@ AOM_CONFIGURE_OPTIONS="-DENABLE_TESTS=OFF -DENABLE_EXAMPLES=OFF -DENABLE_TOOLS=O
   cmake --build . --target install
 )
 
+## OpenSSL: https://github.com/openssl/openssl, used by SRT
+
+OPENSSL_DIR=${BUILD_DIR}/openssl
+if [ ! -d ${OPENSSL_DIR} ]; then
+  echo "OpenSSL source tree is not found"
+  exit 1
+fi
+OPENSSL_X86_DIR=${BUILD_DIR}/openssl_x86
+OPENSSL_X64_DIR=${BUILD_DIR}/openssl_x64
+OPENSSL_CONFIGURE_OPTIONS=""
+(
+  cd ${OPENSSL_DIR}
+  mkdir -p "${OPENSSL_X86_DIR}"
+  rsync -a ./ ${OPENSSL_X86_DIR} --exclude .git
+  cd "${OPENSSL_X86_DIR}"
+  ./Configure --cross-compile-prefix=i686-w64-mingw32- mingw
+  make
+)
+(
+  cd ${OPENSSL_DIR}
+  mkdir -p "${OPENSSL_X64_DIR}"
+  rsync -a ./ ${OPENSSL_X64_DIR} --exclude .git
+  cd "${OPENSSL_X64_DIR}"
+  ./Configure --cross-compile-prefix=x86_64-w64-mingw32- mingw64
+  make
+)
+
+
 ## SRT: https://github.com/Haivision/srt
 
 SRT_DIR=${BUILD_DIR}/srt
-if [ ! -d ${AOM_DIR} ]; then
-  echo "AOM source tree is not found"
+if [ ! -d ${SRT_DIR} ]; then
+  echo "SRT source tree is not found"
   exit 1
 fi
 SRT_X86_DIR=${BUILD_DIR}/srt_x86
 SRT_X64_DIR=${BUILD_DIR}/srt_x64
-SRT_CONFIGURE_OPTIONS="-DENABLE_C_DEPS=ON -DENABLE_SHARED=OFF -DENABLE_STATIC=ON -DENABLE_ENCRYPTION=OFF"
+SRT_CONFIGURE_OPTIONS="-DENABLE_C_DEPS=ON -DENABLE_SHARED=OFF -DENABLE_STATIC=ON -DENABLE_ENCRYPTION=ON"
 (
   mkdir -p "${SRT_X86_DIR}"
   cd "${SRT_X86_DIR}"
-  cmake -DSRT_TARGET_CPU=generic -DCMAKE_TOOLCHAIN_FILE=${AOM_DIR}/build/cmake/toolchains/x86-mingw-gcc.cmake -DCMAKE_INSTALL_PREFIX=${SRT_X86_DIR}/install ${SRT_CONFIGURE_OPTIONS} ${SRT_DIR}
+  cmake -DSRT_TARGET_CPU=generic -DCMAKE_TOOLCHAIN_FILE=${AOM_DIR}/build/cmake/toolchains/x86-mingw-gcc.cmake -DUSE_OPENSSL_PC=OFF -DOPENSSL_ROOT_DIR=${OPENSSL_X86_DIR} -DCMAKE_INSTALL_PREFIX=${SRT_X86_DIR}/install ${SRT_CONFIGURE_OPTIONS} ${SRT_DIR}
   cmake --build . --target install
 )
 (
   mkdir -p "${SRT_X64_DIR}"
   cd "${SRT_X64_DIR}"
-  cmake -DSRT_TARGET_CPU=generic -DCMAKE_TOOLCHAIN_FILE=${AOM_DIR}/build/cmake/toolchains/x86_64-mingw-gcc.cmake -DCMAKE_INSTALL_PREFIX=${SRT_X64_DIR}/install ${SRT_CONFIGURE_OPTIONS} ${SRT_DIR}
+  cmake -DSRT_TARGET_CPU=generic -DCMAKE_TOOLCHAIN_FILE=${AOM_DIR}/build/cmake/toolchains/x86_64-mingw-gcc.cmake -DUSE_OPENSSL_PC=OFF -DOPENSSL_ROOT_DIR=${OPENSSL_X64_DIR} -DCMAKE_INSTALL_PREFIX=${SRT_X64_DIR}/install ${SRT_CONFIGURE_OPTIONS} ${SRT_DIR}
   cmake --build . --target install
 )
 

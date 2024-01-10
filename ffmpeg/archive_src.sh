@@ -7,6 +7,8 @@ mkdir -p ../sources/build/ffmpeg
 mkdir -p ../sources/build/libvpx
 mkdir -p ../sources/build/openh264
 mkdir -p ../sources/build/aom
+mkdir -p ../sources/build/srt
+mkdir -p ../sources/build/openssl
 
 ARCHIVE_TYPE=tar.xz
 (
@@ -33,6 +35,14 @@ git archive --format=tar HEAD | xz -c - > ../../sources/build/libvpx/libvpx-src-
 (
 cd ../build/aom
 git archive --format=tar HEAD | xz -c - > ../../sources/build/aom/aom-src-$(git describe --tags).${ARCHIVE_TYPE}
+)
+(
+cd ../build/srt
+git archive --format=tar HEAD | xz -c - > ../../sources/build/srt/srt-src-$(git describe --tags).${ARCHIVE_TYPE}
+)
+(
+cd ../build/openssl
+git archive --format=tar HEAD | xz -c - > ../../sources/build/openssl/openssl-src-$(git describe --tags).${ARCHIVE_TYPE}
 )
 
 find ../sources/
