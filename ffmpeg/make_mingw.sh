@@ -144,16 +144,16 @@ OPENSSL_CONFIGURE_OPTIONS=""
   mkdir -p "${OPENSSL_X86_DIR}"
   rsync -a ./ ${OPENSSL_X86_DIR} --exclude .git
   cd "${OPENSSL_X86_DIR}"
-  ./Configure --cross-compile-prefix=i686-w64-mingw32- mingw
-  make
+  ./Configure --cross-compile-prefix=i686-w64-mingw32- --prefix=${OPENSSL_X86_DIR}/install --openssldir=${OPENSSL_X86_DIR}/install mingw
+  make install
 )
 (
   cd ${OPENSSL_DIR}
   mkdir -p "${OPENSSL_X64_DIR}"
   rsync -a ./ ${OPENSSL_X64_DIR} --exclude .git
   cd "${OPENSSL_X64_DIR}"
-  ./Configure --cross-compile-prefix=x86_64-w64-mingw32- mingw64
-  make
+  ./Configure --cross-compile-prefix=x86_64-w64-mingw32- --prefix=${OPENSSL_X64_DIR}/install --openssldir=${OPENSSL_X64_DIR}/install mingw64
+  make install
 )
 
 
@@ -197,7 +197,7 @@ FFMPEG_CONFIGURE_OPTIONS="--pkg-config=pkg-config --enable-static --enable-avres
  mkdir -p ${FFMPEG_x86_DIR}
  rsync -a ./ ${FFMPEG_x86_DIR} --exclude .git
  cd ${FFMPEG_x86_DIR}
- PKG_CONFIG_PATH=${openh264_x86_DIR}/lib/pkgconfig:${libvpx_x86_DIR}/install/lib/pkgconfig:${AOM_X86_DIR}/install/lib/pkgconfig:${SRT_X86_DIR}/install/lib/pkgconfig ./configure --enable-cross-compile --arch=x86 --target-os=mingw32 --cross-prefix=i686-w64-mingw32- ${FFMPEG_CONFIGURE_OPTIONS} --prefix=`pwd`/install
+ PKG_CONFIG_PATH=${openh264_x86_DIR}/lib/pkgconfig:${libvpx_x86_DIR}/install/lib/pkgconfig:${AOM_X86_DIR}/install/lib/pkgconfig:${OPENSSL_X86_DIR}/install/lib/pkgconfig:${SRT_X86_DIR}/install/lib/pkgconfig ./configure --enable-cross-compile --arch=x86 --target-os=mingw32 --cross-prefix=i686-w64-mingw32- ${FFMPEG_CONFIGURE_OPTIONS} --prefix=`pwd`/install
  make -j${CPU_COUNT} install
 )
 #[ -d ${FFMPEG_x86_64_DIR} ] ||
@@ -206,7 +206,7 @@ FFMPEG_CONFIGURE_OPTIONS="--pkg-config=pkg-config --enable-static --enable-avres
  mkdir -p ${FFMPEG_x86_64_DIR}
  rsync -a ./ ${FFMPEG_x86_64_DIR} --exclude .git
  cd ${FFMPEG_x86_64_DIR}
- PKG_CONFIG_PATH=${openh264_x86_64_DIR}/lib/pkgconfig:${libvpx_x64_DIR}/install/lib/pkgconfig:${AOM_X64_DIR}/install/lib/pkgconfig:${SRT_X64_DIR}/install/lib/pkgconfig ./configure --enable-cross-compile --arch=x86_64 --target-os=mingw32 --cross-prefix=x86_64-w64-mingw32- ${FFMPEG_CONFIGURE_OPTIONS} --prefix=`pwd`/install
+ PKG_CONFIG_PATH=${openh264_x86_64_DIR}/lib/pkgconfig:${libvpx_x64_DIR}/install/lib/pkgconfig:${AOM_X64_DIR}/install/lib/pkgconfig:${OPENSSL_X64_DIR}/install/lib/pkgconfig:${SRT_X64_DIR}/install/lib/pkgconfig ./configure --enable-cross-compile --arch=x86_64 --target-os=mingw32 --cross-prefix=x86_64-w64-mingw32- ${FFMPEG_CONFIGURE_OPTIONS} --prefix=`pwd`/install
 
  make -j${CPU_COUNT} install
 )
