@@ -171,13 +171,15 @@ SRT_CONFIGURE_OPTIONS="-DENABLE_C_DEPS=ON -DENABLE_SHARED=OFF -DENABLE_STATIC=ON
   mkdir -p "${SRT_X86_DIR}"
   cd "${SRT_X86_DIR}"
   cmake -DSRT_TARGET_CPU=generic -DCMAKE_TOOLCHAIN_FILE=${AOM_DIR}/build/cmake/toolchains/x86-mingw-gcc.cmake -DUSE_OPENSSL_PC=OFF -DOPENSSL_ROOT_DIR=${OPENSSL_X86_DIR} -DCMAKE_INSTALL_PREFIX=${SRT_X86_DIR}/install ${SRT_CONFIGURE_OPTIONS} ${SRT_DIR}
-  cmake --build . --target install
+  cmake --build . --target install \
+      && cp -rp ${OPENSSL_X86_DIR}/install/include ${OPENSSL_X86_DIR}/install/lib ${SRT_X86_DIR}/install/
 )
 (
   mkdir -p "${SRT_X64_DIR}"
   cd "${SRT_X64_DIR}"
   cmake -DSRT_TARGET_CPU=generic -DCMAKE_TOOLCHAIN_FILE=${AOM_DIR}/build/cmake/toolchains/x86_64-mingw-gcc.cmake -DUSE_OPENSSL_PC=OFF -DOPENSSL_ROOT_DIR=${OPENSSL_X64_DIR} -DCMAKE_INSTALL_PREFIX=${SRT_X64_DIR}/install ${SRT_CONFIGURE_OPTIONS} ${SRT_DIR}
-  cmake --build . --target install
+  cmake --build . --target install \
+      && cp -rp ${OPENSSL_X64_DIR}/install/include ${OPENSSL_X64_DIR}/install/lib ${SRT_X64_DIR}/install/
 )
 
 FFMPEG_DIR=${BUILD_DIR}/ffmpeg
